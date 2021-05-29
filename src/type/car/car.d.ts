@@ -37,3 +37,12 @@ export interface IQueryOptions {
     search?: string;
     total_size?: number;
 }
+
+export interface CarDeleteResponse extends CarDeleteCount  {
+    ok?: number;
+    n?: number;
+} 
+
+export interface CarDeleteCount {
+    deletedCount?: number;
+}

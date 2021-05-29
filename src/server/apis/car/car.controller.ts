@@ -1,66 +1,72 @@
 import { Controller, Delete, Get, Post, Put, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
+import l, { logger } from 'src/server/common/logger';
 import { generateJsonResponse, manageError } from 'src/server/helper/response.helper';
 import { CarService } from './car.service';
 
 @Controller('car')
 export class CarController {
 
-    constructor(private carService: CarService) {}
+    constructor(private carService: CarService) { }
 
     @Get()
-    public getCars(@Req() req: Request, @Res() res: Response) {
-        this.carService.getCars(req.query).then(
-            (cars) => generateJsonResponse(res, cars, 200, 'Cars fetched')),
-            ((error) => {
-                const err = manageError(error);
-                generateJsonResponse(res, '', err.code, err.message);
-              }
-        );
+    public async getCars(@Req() req: Request, @Res() res: Response) {
+        try {
+            const request = await this.carService.getCars(req.query);
+            generateJsonResponse(res, request, 200, 'Cars fetched')
+        }
+        catch (error) {
+            const err = manageError(error);
+            generateJsonResponse(res, '', err.code, err.message);
+        }
     }
 
     @Post()
-    public insertCar(@Req() req: Request, @Res() res: Response) {
-        this.carService.insertCar(req.body).then(
-            (cars) => generateJsonResponse(res, cars, 200, 'Successfully Inserted Record')),
-            ((error) => {
-                const err = manageError(error);
-                generateJsonResponse(res, '', err.code, err.message);
-              }
-        );;
+    public async insertCar(@Req() req: Request, @Res() res: Response) {
+        try {
+            const request = await this.carService.insertCar(req.body);
+            generateJsonResponse(res, request, 200, 'Successfully Inserted Record');
+        }
+        catch (error) {
+            const err = manageError(error);
+            generateJsonResponse(res, '', err.code, err.message);
+        }
     }
 
     @Get(':id')
-    public getCarById(@Req() req: Request, @Res() res: Response) {
-        this.carService.getCarByID(req.params.id).then(
-            (cars) => generateJsonResponse(res, cars, 200, 'Record Fetched')),
-            ((error) => {
-                const err = manageError(error);
-                generateJsonResponse(res, '', err.code, err.message);
-              }
-        );;
+    public async getCarById(@Req() req: Request, @Res() res: Response) {
+        try {
+            const request = await this.carService.getCarByID(req.params.id);
+            generateJsonResponse(res, request, 200, 'Record Fetched');
+        }
+        catch (error) {
+            const err = manageError(error);
+            generateJsonResponse(res, '', err.code, err.message);
+        }
     }
 
     @Put(":id")
-    public updateCarByID(@Req() req: Request, @Res() res: Response) {
-        this.carService.updateCarByID(req.params.id, req.body).then(
-            (cars) => generateJsonResponse(res, cars, 200, 'Successfully Updated Record')),
-            ((error) => {
-                const err = manageError(error);
-                generateJsonResponse(res, '', err.code, err.message);
-              }
-        );
+    public async updateCarByID(@Req() req: Request, @Res() res: Response) {
+        try {
+            const request = await this.carService.updateCarByID(req.params.id, req.body);
+            generateJsonResponse(res, request, 200, 'Successfully Updated Record');
+        }
+        catch (error) {
+            const err = manageError(error);
+            generateJsonResponse(res, '', err.code, err.message);
+        }
     }
 
     @Delete(':id')
-    public deleteCarByID(@Req() req: Request, @Res() res: Response) {
-        this.carService.deleteCarByID(req.params.id).then(
-            (cars) => generateJsonResponse(res, cars, 200, 'Successfully Delete Record')),
-            ((error) => {
-                const err = manageError(error);
-                generateJsonResponse(res, '', err.code, err.message);
-              }
-        );
+    public async deleteCarByID(@Req() req: Request, @Res() res: Response) {
+        try {
+            const request = await this.carService.deleteCarByID(req.params.id);
+            generateJsonResponse(res, request, 200, 'Successfully Delete Record');
+        }
+        catch (error) {
+            const err = manageError(error);
+            generateJsonResponse(res, '', err.code, err.message);
+        }
     }
 
 }

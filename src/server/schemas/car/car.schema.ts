@@ -13,7 +13,7 @@ export const CAR_SCHEMA = new mongoose.Schema({
         type: String,
         requried: true
     },
-    model: {
+    carModel: {
         type: String,
         requried: true
     },

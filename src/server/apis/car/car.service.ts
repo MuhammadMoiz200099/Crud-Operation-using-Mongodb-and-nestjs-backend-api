@@ -3,7 +3,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ICar } from '../../interfaces/car/car.interface';
-import { ICarsDataPayload, ICarsPayload, IQueryOptions } from 'src/type/car/car';
+import { ICarsDataPayload, ICarsPayload, IQueryOptions, CarDeleteResponse } from 'src/type/car/car';
 import { of } from 'rxjs';
 
 const carProjection = {
@@ -15,7 +15,7 @@ export class CarService {
 
     constructor(@InjectModel('Car') private readonly carModel: Model<ICar>) {}
 
-    public async getCars(queryOptions?: IQueryOptions): Promise<ICarsDataPayload> {
+    public async getCars(queryOptions?: IQueryOptions): Promise<ICarsDataPayload | HttpException> {
         let records: ICar[] = []; 
         if(queryOptions.search) {
             records = await this.carModel.find(
@@ -34,7 +34,7 @@ export class CarService {
         }
 
         if(!records || !records[0]) {
-            throw new HttpException('Record not found!', 404);
+            return Promise.reject(new HttpException('Record not found!', 404));
         }
 
         const response: ICarsDataPayload = {
@@ -47,31 +47,31 @@ export class CarService {
         return response;
     }
 
-    public async getCarByID(_id: string): Promise<ICarsPayload> {
+    public async getCarByID(_id: string): Promise<ICarsPayload | HttpException> {
         const record = await this.carModel.findOne({ _id }, carProjection).exec();
          if(!record) {
-            throw new HttpException(`Record aganist {id: ${_id}} not found!`, 404);
+            return Promise.reject(new HttpException(`Record aganist {id: ${_id}} not found!`, 404));
         }
         return record;
     }
 
-    public async insertCar(car: ICarsPayload): Promise<ICarsPayload> {
+    public async insertCar(car: ICarsPayload): Promise<ICarsPayload | HttpException> {
         const record = await new this.carModel(car);
         return record.save();   
     }
 
-    public async updateCarByID(_id: string, car: ICarsPayload): Promise<ICarsPayload> {
+    public async updateCarByID(_id: string, car: ICarsPayload): Promise<ICarsPayload | HttpException> {
         const record = await this.carModel.findOneAndUpdate({ _id }, { ...car }, {}).exec();
         if(!record) {
-            throw new HttpException(`Record aganist {id: ${_id}} not found!`, 404);
+            return Promise.reject(new HttpException(`Record aganist {id: ${_id}} not found!`, 404));
         }
         return record;
     }
 
-    public async deleteCarByID(_id: string) {
+    public async deleteCarByID(_id: string): Promise<CarDeleteResponse | HttpException> {
         const record = await this.carModel.deleteOne({ _id }).exec();
         if(record.deletedCount === 0) {
-            throw new HttpException(`Record aganist {id: ${_id}} not found!`, 404);
+            return Promise.reject(new HttpException(`Record aganist {id: ${_id}} not found!`, 404));
         }
         return record;
     }
